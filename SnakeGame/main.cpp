@@ -46,9 +46,14 @@ class SNAKE {
         }
 
         void moveSnake(int direction){
+            // Clear the tail of the snake
+            gotoxy(snake[snakeLength - 1].x, snake[snakeLength - 1].y);
+            cout << " ";
+
             for (int i = snakeLength - 1; i > 0; i--) {
                 snake[i] = snake[i - 1];
             }
+
             if (direction==0) snake[0].x += MOVING_DISTANCE;
             if (direction==1) snake[0].y += MOVING_DISTANCE;
             if (direction==2) snake[0].x -= MOVING_DISTANCE;
@@ -60,6 +65,13 @@ class SNAKE {
                 generateFood();
             }
         }
+
+         void gameOver(){
+            system("cls");
+            cout << "Game Over!!!";
+            exit(0);
+         }
+
         // FOOD
         bool isFoodValid(Point newFood) {
             for (int i = 0; i < snakeLength; i++ ) {
