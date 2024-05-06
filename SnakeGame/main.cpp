@@ -4,62 +4,102 @@
 #include <conio.h>
 using namespace std;
 void gotoxy( int column, int line );
-struct Point{
-    int x,y;
-};
-class CONRAN{
-public:
-    struct Point A[100];
-    int DoDai;
-    CONRAN(){
-        DoDai = 3;
-        A[0].x = 10; A[0].y = 10;
-        A[1].x = 11; A[1].y = 10;
-        A[2].x = 12; A[2].y = 10;
-    }
-    void Ve(){
-        for (int i = 0; i < DoDai; i++){
-            gotoxy(A[i].x,A[i].y);
-            cout<<"X";
-        }
-    }
-    void DiChuyen(int Huong){
-        for (int i = DoDai-1; i>0;i--)
-            A[i] = A[i-1];
-        if (Huong==0) A[0].x = A[0].x + 1;
-        if (Huong==1) A[0].y = A[0].y + 1;
-        if (Huong==2) A[0].x = A[0].x - 1;
-        if (Huong==3) A[0].y = A[0].y - 1;
 
-    }
+struct Point {
+    int x, y;
 };
 
-int main()
-{
-    CONRAN r;
-    int Huong = 0;
-    char t;
+const int MOVING_DISTANCE = 1;
 
-    while (1){
-        if (kbhit()){
-            t = getch();
-            if (t=='a') Huong = 2;
-            if (t=='w') Huong = 3;
-            if (t=='d') Huong = 0;
-            if (t=='x') Huong = 1;
+const int WIDTH = 50;
+const int HEIGHT = 20;
+
+class SNAKE {
+    public:
+        Point snake[100];
+        int snakeLength;
+        Point food;
+
+        SNAKE(){
+            snakeLength = 3;
+            snake[0].x = 10; snake[0].y = 10;
+            snake[1].x = 11; snake[1].y = 10;
+            snake[2].x = 12; snake[2].y = 10;
+
+            generateFood();
         }
-        system("cls");
-        r.Ve();
-        r.DiChuyen(Huong);
-        Sleep(300);
+
+        void drawSnake(){
+            for (int i = 0; i < snakeLength; i++){
+                if (i == 0) {
+                    gotoxy(snake[i].x, snake[i].y);
+                    cout << "O";
+                }
+                gotoxy(snake[i].x, snake[i].y);
+                cout << "o";
+            }
+        }
+
+        void drawFood() {
+            gotoxy(food.x, food.y);
+            cout << "*";
+        }
+
+        void moveSnake(int direction){
+            for (int i = snakeLength - 1; i > 0; i--) {
+                snake[i] = snake[i - 1];
+            }
+            if (direction==0) snake[0].x += MOVING_DISTANCE;
+            if (direction==1) snake[0].y += MOVING_DISTANCE;
+            if (direction==2) snake[0].x -= MOVING_DISTANCE;
+            if (direction==3) snake[0].y -= MOVING_DISTANCE;
+
+            // eat food
+            if (snake[0].x == food.x && snake[0].y == food.y) {
+                snakeLength++;
+                generateFood();
+            }
+        }
+        // FOOD
+        bool isFoodValid(Point newFood) {
+            for (int i = 0; i < snakeLength; i++ ) {
+                if (newFood.x == snake[i].x && newFood.y == snake[i].y)
+                    return false;
+            }
+            return true;
+        }
+
+        void generateFood() {
+            do  {
+                food.x = rand() % (WIDTH - 2) + 1;
+                food.y = rand() % (HEIGHT - 2) + 1;
+            } while (!isFoodValid(food));
+        }
+};
+
+
+
+void drawGameArea() {
+    for (int i = 0; i < WIDTH + 2; i++) {
+        cout << "-";
+    }
+    cout << endl;
+
+    for (int i = 0; i < HEIGHT; i++) {
+        cout << "|";
+        for (int j = 0; j < WIDTH; j++) {
+            cout << " ";
+        }
+        cout << "|" << endl;
     }
 
-    return 0;
+    for (int i = 0; i < WIDTH + 2; i++) {
+        cout << "-";
+    }
+    cout << endl;
 }
 
-
-void gotoxy( int column, int line )
-  {
+void gotoxy( int column, int line ) {
   COORD coord;
   coord.X = column;
   coord.Y = line;
@@ -67,4 +107,34 @@ void gotoxy( int column, int line )
     GetStdHandle( STD_OUTPUT_HANDLE ),
     coord
     );
-  }
+}
+
+int main()
+{
+    SNAKE snake;
+    char t;
+    int direction = 0;
+
+    drawGameArea();
+    snake.drawFood();
+    snake.drawSnake();
+
+    while (1){
+        if (kbhit()){
+            t = getch();
+            if (t=='a') direction = 2;
+            if (t=='w') direction = 3;
+            if (t=='d') direction = 0;
+            if (t=='s') direction = 1;
+        }
+        snake.moveSnake(direction);
+        snake.drawFood();
+        snake.drawSnake();
+        Sleep(300);
+    }
+
+    return 0;
+}
+
+
+
