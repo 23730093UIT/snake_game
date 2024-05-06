@@ -54,10 +54,16 @@ class SNAKE {
             if (direction==2) snake[0].x -= MOVING_DISTANCE;
             if (direction==3) snake[0].y -= MOVING_DISTANCE;
 
-            if (snake[0].x == food.x && snake[0].y == food.y) {
-                snakeLength++;
+            if (snake[0].x < 1 || snake[0].x > WIDTH || snake[0].y < 1 || snake[0].y > HEIGHT) {
+                gameOver();
         }
 };
+
+void gameOver(){
+    system("cls");
+    cout << "Game Over!!!";
+    exit(0);
+}
 
 void drawGameArea() {
     for (int i = 0; i < WIDTH + 2; i++) {
@@ -113,6 +119,3 @@ int main()
 
     return 0;
 }
-
-
-
